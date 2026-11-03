@@ -11,11 +11,14 @@ from contextlib import closing, contextmanager
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-from vendor.message_content import content_to_text, searchable_user_message_text
-
 VERSION = 1
 HK = timezone(timedelta(hours=8))
 UUID = re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I)
+CONTEXT_TAGS = ("environment_context", "external_codex_apps_open_page", "permissions instructions")
+CONTEXT_BLOCK = re.compile(
+    r"\A\s*<(?P<tag>" + "|".join(re.escape(tag) for tag in CONTEXT_TAGS)
+    + r")>.*?</(?P=tag)>\s*", re.DOTALL,
+)
 
 
 def default_home():
@@ -67,17 +70,43 @@ def objects(path):
 
 
 def clean_content(content):
-    if isinstance(content, list):
-        content = [x for x in content if isinstance(x, str) or
-                   (isinstance(x, dict) and isinstance(x.get("text"), str))]
-    return content_to_text(content).replace("\x00", "")
+    """Collect textual blocks without serializing arbitrary payloads or media."""
+    pending = [content]
+    fragments = []
+    while pending:
+        block = pending.pop()
+        if isinstance(block, str):
+            if block.strip().casefold() not in ("<image>", "</image>"):
+                fragments.append(block.replace("\x00", ""))
+        elif isinstance(block, list):
+            pending.extend(reversed(block))
+        elif isinstance(block, dict):
+            kind = str(block.get("type", "")).casefold()
+            if "image" in kind or "audio" in kind:
+                continue
+            text = block.get("text")
+            if isinstance(text, str):
+                pending.append(text)
+            elif isinstance(block.get("content"), (str, list)):
+                pending.append(block["content"])
+    return "\n".join(fragment for fragment in fragments if fragment)
 
 
 def visible_user(text):
-    text = searchable_user_message_text(text)
-    if text.lstrip().startswith(("<external_codex_apps_open_page>", "<permissions instructions>")):
+    """Separate an actual request from standalone automatically added context."""
+    request = text.lstrip()
+    if request.startswith("# AGENTS.md instructions"):
         return ""
-    return text
+    if request.startswith("# Context from my IDE setup:"):
+        boundary = re.search(r"^## My request for Codex:\s*$", request, re.MULTILINE)
+        return request[boundary.end():].strip() if boundary else ""
+    while True:
+        block = CONTEXT_BLOCK.match(request)
+        if block is None:
+            if any(request.startswith("<" + tag + ">") for tag in CONTEXT_TAGS):
+                return ""
+            return request
+        request = request[block.end():].lstrip()
 
 
 def text_value(value):

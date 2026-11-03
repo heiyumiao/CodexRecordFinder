@@ -560,7 +560,7 @@ def main():
         root.withdraw()
         app = App(root, Index(args.home, args.cache))
         root.update_idletasks()
-        checks = dict(ok=True, version="0.2", python=sys.version.split()[0], sqlite=sqlite3.sqlite_version,
+        checks = dict(ok=True, version="0.3", python=sys.version.split()[0], sqlite=sqlite3.sqlite_version,
                       tk=root.tk.call("info", "patchlevel"), interface="loaded", all_message_hits=True)
         args.self_check.write_text(json.dumps(checks, ensure_ascii=False, indent=2), encoding="utf-8")
         root.destroy()
