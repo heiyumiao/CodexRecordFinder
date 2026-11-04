@@ -1,12 +1,12 @@
 # Codex Record Finder
 
-**English** | [简体中文](README.zh-CN.md)
+**English** | [Simplified Chinese](README.zh-CN.md)
 
 An offline Windows desktop tool for searching local Codex conversations, including archived chats and older messages retained in the local history database.
 
 Download [CodexRecordFinder.exe](https://github.com/heiyumiao/CodexRecordFinder/raw/refs/heads/main/CodexRecordFinder.exe) and double-click it to start. No Python installation, account login, or API key is required for the packaged app.
 
-The desktop interface is currently in Simplified Chinese. Both English and Chinese search queries are supported.
+The desktop interface is currently in Simplified Chinese. Both English and Chinese search queries are supported. Control names in this guide are English translations of the interface labels.
 
 ## Features
 
@@ -24,20 +24,20 @@ The desktop interface is currently in Simplified Chinese. Both English and Chine
 1. Open `CodexRecordFinder.exe`. The app uses `CODEX_HOME` when set, otherwise `%USERPROFILE%\.codex`. Select another Codex data directory if needed.
 2. Wait for the initial index. Large histories and tool logs may take several minutes; later refreshes reuse unchanged sessions.
 3. Enter a remembered phrase, keyword, or code fragment. The default scope covers user messages, Codex responses, titles, and project paths.
-4. Choose **仅已归档** to show archived conversations only. Choose **含工具输出** to search commands, errors, and tool logs as well.
-5. Select a result to preview its context. **全部命中** lists matching messages throughout the conversation, including messages outside the current preview page.
-6. Use **导出全文** to save all indexed text for the selected conversation as Markdown.
+4. Choose **Archived only** to show archived conversations only. Choose **Include tool output** to search commands, errors, and tool logs as well.
+5. Select a result to preview its context. **All matches** lists matching messages throughout the conversation, including messages outside the current preview page.
+6. Use **Export full conversation** to save all indexed text for the selected conversation as Markdown.
 
 ### Search controls
 
 | Control | Meaning |
 | --- | --- |
-| 全部关键词 | All keywords must match the same conversation; they may occur in different messages. |
-| 任一关键词 | Match any of the keywords. |
-| 完整短语 | Match the entire input as one continuous substring. |
-| 用户与回答 | Search user messages and Codex responses. |
-| 含工具输出 | Also include tool input and output. |
-| 状态未知 | History exists, but reliable archive metadata is unavailable. |
+| All keywords | All keywords must match the same conversation; they may occur in different messages. |
+| Any keyword | Match any of the keywords. |
+| Exact phrase | Match the entire input as one continuous substring. |
+| User and Codex messages | Search user messages and Codex responses. |
+| Include tool output | Also include tool input and output. |
+| Unknown status | History exists, but reliable archive metadata is unavailable. |
 
 Separate keywords with spaces. Use double quotes to keep multiple words together. Searches accept up to 20 terms. Date filters use the conversation's last update time in Hong Kong time (UTC+8), with both dates inclusive.
 
@@ -50,7 +50,7 @@ Separate keywords with spaces. Use double quotes to keep multiple words together
 | `F3` / `Shift+F3` | Next / previous highlighted match on the current page |
 | `Esc` | Clear the query |
 
-**在 Codex 打开** attempts to open `codex://threads/<ID>` through the operating system. Availability depends on your Codex installation and whether the conversation is still accessible. This action does not restore or unarchive conversations.
+**Open in Codex** attempts to open `codex://threads/<ID>` through the operating system. Availability depends on your Codex installation and whether the conversation is still accessible. This action does not restore or unarchive conversations.
 
 ## Local data sources
 
@@ -68,7 +68,7 @@ Conversations are deduplicated by ID across these sources:
 
 - Existing transcript files are preferred over the history database. A session is not counted twice.
 - A file in `archived_sessions` is treated as archived even if database metadata is stale.
-- Conversations without reliable archive metadata are labeled **状态未知** and remain searchable under **全部记录**.
+- Conversations without reliable archive metadata are labeled **Unknown status** and remain searchable under **All records**.
 - Metadata-only conversations can still be found by title or project path; the preview states when message text is unavailable.
 - Previews show up to 120 messages per page. Individual messages longer than 18,000 characters show an excerpt around a match. Markdown exports contain all indexed text, without preview pagination or excerpt limits.
 - Image/audio payloads, reasoning records, system instructions, and common automatically injected context are excluded from searchable message text.
