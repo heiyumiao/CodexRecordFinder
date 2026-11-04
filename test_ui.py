@@ -4,6 +4,7 @@ import unittest
 
 import test_engine
 from app import App
+from engine import display_date
 
 
 class InterfaceTests(unittest.TestCase):
@@ -60,6 +61,21 @@ class InterfaceTests(unittest.TestCase):
         self.assertIsNone(app.current)
         self.assertEqual(str(app.hit_choice.cget("state")), "disabled")
         self.assertFalse(app.text.get("1.0", "end").strip())
+
+    def test_default_search_and_reset_use_recent_order(self):
+        app = self.app
+        self.assertEqual(app.sort.get(), "按最近更新")
+        app.query.set("资金")
+        app.run_search()
+        app.poll()
+        self.assertEqual(list(app.tree.get_children()), [test_engine.B, test_engine.A])
+        newest = app.rows[test_engine.B]
+        self.assertIn(display_date(newest["updated"]), app.tree.item(test_engine.B, "text"))
+        app.sort.set("按相关度")
+        app.reset_filters()
+        app.poll()
+        self.assertEqual(app.sort.get(), "按最近更新")
+        self.assertEqual(list(app.tree.get_children()), [test_engine.B, test_engine.A])
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import hashlib
 import json
+from contextlib import closing
 from pathlib import Path
 import sqlite3
 import tempfile
@@ -174,6 +175,23 @@ class SearchTests(unittest.TestCase):
         self.index.refresh()
         self.assertEqual(self.ids("更新索引"), {B})
         self.assertEqual(self.ids("普通聊天股票"), set())
+
+    def test_default_sort_prefers_recent_chat_over_older_title_match(self):
+        self.write_rollout(self.archived, A, [("user", "needle older conversation")])
+        self.write_rollout(self.active, B, [("user", "needle newer conversation")])
+        with closing(sqlite3.connect(self.home / "state_5.sqlite")) as state:
+            state.execute("UPDATE threads SET title=? WHERE id=?", ("needle in old title", A))
+            state.commit()
+        self.index.refresh()
+        recent = self.index.search("needle")
+        self.assertEqual([r["id"] for r in recent["results"]], [B, A])
+        self.assertGreater(recent["results"][0]["updated"], recent["results"][1]["updated"])
+        relevant = self.index.search("needle", sort="relevance")
+        self.assertEqual([r["id"] for r in relevant["results"]], [A, B])
+        first_page = self.index.search("needle", limit=1)
+        second_page = self.index.search("needle", limit=1, offset=1)
+        self.assertEqual(first_page["results"][0]["id"], B)
+        self.assertEqual(second_page["results"][0]["id"], A)
 
 
 if __name__ == "__main__":

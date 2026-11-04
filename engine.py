@@ -395,7 +395,7 @@ class Index:
             return [query.strip().casefold()] if query.strip() else []
         return list(dict.fromkeys((a or b).casefold() for a, b in re.findall(r'"([^"]+)"|(\S+)', query)))[:20]
 
-    def search(self, query="", archived=None, role="dialogue", mode="all", cwd="", after="", before="", sort="relevance", limit=200, offset=0):
+    def search(self, query="", archived=None, role="dialogue", mode="all", cwd="", after="", before="", sort="recent", limit=200, offset=0):
         terms = self.terms(query, mode)
         start = datetime.strptime(after, "%Y-%m-%d").replace(tzinfo=HK).timestamp() if after else None
         end = datetime.strptime(before, "%Y-%m-%d").replace(tzinfo=HK).timestamp() + 86400 if before else None

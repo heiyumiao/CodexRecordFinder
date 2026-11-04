@@ -14,6 +14,7 @@ The desktop interface is currently in Simplified Chinese. Both English and Chine
 - Include archived chats and use the local history database when original session files are missing.
 - Match Chinese substrings, including one- and two-character queries, and case-insensitive English text.
 - Use all-keyword, any-keyword, or exact-phrase search; filter by archive status, role, project, and update date.
+- Results default to the conversation's last update time, newest first. Update times appear in the result list; relevance sorting remains available as an option.
 - View highlighted matches, list every matching message in a conversation, and jump to its surrounding context.
 - Copy conversation IDs, reveal source files, and export complete indexed conversation text to Markdown.
 - Refresh the index incrementally, with optional automatic refresh every minute.

@@ -117,7 +117,7 @@ class App:
         self.archive = self.combo(filters, list(ARCHIVE), "全部记录", 12)
         self.role = self.combo(filters, list(ROLE), "用户与回答", 12)
         self.mode = self.combo(filters, list(MODE), "全部关键词", 12)
-        self.sort = self.combo(filters, ["按相关度", "按最近更新"], "按相关度", 11)
+        self.sort = self.combo(filters, ["按最近更新", "按相关度"], "按最近更新", 11)
         ttk.Label(filters, text="项目").pack(side="left", padx=(8, 5))
         self.cwd = tk.StringVar()
         project = ttk.Entry(filters, textvariable=self.cwd, width=18)
@@ -329,7 +329,7 @@ class App:
         self.archive.set("全部记录")
         self.role.set("用户与回答")
         self.mode.set("全部关键词")
-        self.sort.set("按相关度")
+        self.sort.set("按最近更新")
         self.cwd.set("")
         self.after.set("")
         self.before.set("")
@@ -369,7 +369,7 @@ class App:
         for sid, row in self.rows.items():
             title = row["title"].replace("\n", " ")
             snippet = row["snippet"].replace("\n", " ")
-            self.tree.insert("", "end", iid=sid, text=f"{title}\n{snippet}", values=(STATE.get(row["archived"], "状态未知"), row["hits"] or "标题" if self.terms else ""))
+            self.tree.insert("", "end", iid=sid, text=f"{title}\n{display_date(row['updated'])} · {snippet}", values=(STATE.get(row["archived"], "状态未知"), row["hits"] or "标题" if self.terms else ""))
         count = len(self.rows)
         self.result_count.set(f"{result['total']} 个结果" + (f"  /  已加载 {count}" if count < result["total"] else ""))
         self.more.configure(state="normal" if count < result["total"] else "disabled")
@@ -560,7 +560,7 @@ def main():
         root.withdraw()
         app = App(root, Index(args.home, args.cache))
         root.update_idletasks()
-        checks = dict(ok=True, version="0.3", python=sys.version.split()[0], sqlite=sqlite3.sqlite_version,
+        checks = dict(ok=True, version="0.4", python=sys.version.split()[0], sqlite=sqlite3.sqlite_version,
                       tk=root.tk.call("info", "patchlevel"), interface="loaded", all_message_hits=True)
         args.self_check.write_text(json.dumps(checks, ensure_ascii=False, indent=2), encoding="utf-8")
         root.destroy()
